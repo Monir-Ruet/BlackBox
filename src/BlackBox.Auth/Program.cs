@@ -24,7 +24,7 @@ builder.Configuration.AddAzureAppConfiguration(options =>
     options.Connect(appConfigurationUrl)
         .Select("*", labelFilter: env)
         // We don't need to refresh from key vault very often.
-        // This could possibly be increased up from 1 hour.
+        // This could possibly be increased up from 1 hour
         .ConfigureRefresh(appConfigurationRefreshOptions =>
         {
             // Watch for this one app configuration.
