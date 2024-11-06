@@ -48,7 +48,7 @@ jobs:
           
       - name: Docker Image Build And Push
         run: |
-          docker buildx build -f ./src/BlackBox.Auth/Dockerfile . --push --tag {{secrets.DOCKER_USERNAME}}/$IMAGE_NAME:latest
+          docker buildx build -f ./src/BlackBox.Auth/Dockerfile . --push --tag ${{secrets.DOCKER_USERNAME}}/$IMAGE_NAME:latest
 
       
       
