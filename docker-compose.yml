@@ -1,0 +1,129 @@
+﻿services:
+  blackbox-auth:
+    container_name: blackbox-auth
+    env_file:
+      - .env
+      - .env.secrets
+    environment:
+      - "ASPNETCORE_ENVIRONMENT=Development"
+    build:
+      context: .
+      dockerfile: src/BlackBox.Auth/Dockerfile
+    depends_on:
+      - redis
+      - rabbitmq
+      - placement
+      - zipkin
+    ports:
+      - "50100:50001"
+      - "8080:8080"
+    networks:
+      - blackbox-dapr
+  
+  blackbox-auth-dapr:
+    container_name: blackbox-auth-dapr
+    image: "daprio/dapr:latest"
+    command: [
+      "./daprd",
+      "-app-id", "blackbox-auth",
+      "-app-port", "8080",
+      "-placement-host-address", "placement:50006", # Dapr's placement service can be reach via the docker DNS entry
+      "-resources-path", "/components",
+      "-config", "/configuration/config.yaml",
+      "--enable-api-logging"
+    ]
+    depends_on:
+      - blackbox-auth
+    network_mode: "service:blackbox-auth"
+    volumes:
+      - "./dapr/components/:/components"
+      - "./dapr/configuration/:/configuration"
+    
+  blackbox-web:
+    container_name: blackbox-web
+    env_file:
+      - .env
+      - .env.secrets
+    environment:
+      - "ASPNETCORE_ENVIRONMENT=Development"
+    build:
+      context: .
+      dockerfile: src/Blackbox.web/Dockerfile
+    depends_on:
+      - redis
+      - rabbitmq
+      - placement
+      - zipkin
+    ports:
+      - "50101:50001"
+      - "8081:8080"
+    networks:
+      - blackbox-dapr
+  
+  blackbox-web-dapr:
+    container_name: blackbox-web-dapr
+    image: "daprio/daprd:latest"
+    command: [
+      "./daprd",
+      "--app-id", "blackbox-web",
+      "--app-port", "8080",
+      "--placement-host-address", "placement:50006", # Dapr's placement service can be reach via the docker DNS entry
+      "-resources-path", "/components",
+      "-config", "/configuration/config.yaml"
+    ]
+    depends_on: 
+      - blackbox-web
+    network_mode: "service:blackbox-web"
+    volumes:
+      - "./dapr/components/:/components"
+      - "./dapr/configuration/:/configuration"
+      
+  # Dapr placement service
+  placement:
+    container_name: placement
+    image: "daprio/dapr"
+    command: [ "./placement", "-port", "50006" ]
+    ports:
+      - "50110:50006"
+    networks:
+      - blackbox-dapr
+
+  # RabbitMQ pubsub
+  
+  rabbitmq: &rmq
+    container_name: rabbitmq
+    image: "rabbitmq:management-alpine"
+    environment:
+      RABBITMQ_ERLANG_COOKIE: blackbox-dapr
+      RABBITMQ_LOG: debug,+color
+    ports:
+      - "50111:5672"
+      - "15673:15672"
+      - "15693:15692"
+    networks:
+      - blackbox-dapr
+
+  # Redis state store
+  redis:
+    container_name: redis
+    image: "redis:alpine"
+    ports:
+      - "50108:6379"
+    networks:
+      - blackbox-dapr
+
+  # Zipkin tracing service
+  
+  zipkin:
+    container_name: zipkin
+    image: "openzipkin/zipkin-slim:2.23"
+    ports:
+      - "5411:9411"
+    networks:
+      - blackbox-dapr
+
+networks:
+  blackbox-dapr:
+    name: projectx-dapr
+    driver: bridge
+    
