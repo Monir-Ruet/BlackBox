@@ -54,7 +54,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/BlackBoxAuth:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/blackboxauth:latest
 
       
       
