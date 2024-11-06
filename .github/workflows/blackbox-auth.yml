@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./src/BlackBox.Auth
+        working-directory: src/BlackBox.Auth
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET
@@ -48,6 +48,10 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: List
+        run: ls -la
+      - name: P
+        run: pwd
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
