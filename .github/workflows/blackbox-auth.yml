@@ -5,14 +5,14 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - /src/BlackBox.Auth
+      - "src/BlackBox.Auth"
   pull_request:
     branches: [ "main" ]
     paths:
-      - /src/BlackBox.Auth
+      - "src/BlackBox.Auth"
   workflow_dispatch:
 env:
-  IMAGE_NAME: "BlackBox-Auth"
+  IMAGE_NAME: "blackbox-auth"
   
 jobs:
   build:
@@ -45,13 +45,10 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          file: ./src/BlackBox.Auth/Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/blackboxauth:latest
+          
+      - name: Docker Image Build And Push
+        run: |
+          docker buildx build -f ./src/BlackBox.Auth/Dockerfile . --push --tag {{secrets.DOCKER_USERNAME}}/$IMAGE_NAME:latest
 
       
       
