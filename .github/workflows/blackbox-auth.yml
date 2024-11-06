@@ -50,7 +50,7 @@ jobs:
         run: |
           docker buildx build \
           -f ./src/BlackBox.Auth/Dockerfile . \
-          --platform linux/amd64,linux/arm64,linux/arm/v7,darwin/amd64,darwin/arm64 \
+          --platform linux/amd64,linux/arm64,linux/arm/v7 \
           --push \
           --tag ${{secrets.DOCKER_USERNAME}}/$IMAGE_NAME:latest
 
