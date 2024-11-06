@@ -12,7 +12,7 @@ on:
       - "src/BlackBox.Auth"
   workflow_dispatch:
 env:
-  IMAGE_NAME: "blackbox-auth"
+  IMAGE_NAME: "blackboxauth"
   
 jobs:
   build:
