@@ -5,11 +5,7 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - "src/BlackBox.Auth"
-  pull_request:
-    branches: [ "main" ]
-    paths:
-      - "src/BlackBox.Auth"
+      - ./src/BlackBox.Auth
   workflow_dispatch:
 env:
   IMAGE_NAME: "blackboxauth"
