@@ -1,0 +1,31 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - /src/BlackBox.Auth
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - /src/BlackBox.Auth
+env:
+  IMAGE_NAME: "BlackBox-Auth"
+  
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Restore Nuget
+      run: dotnet restore
+    - name: Build .Net
+      run: dotnet build
+    - name: Publish .Net
+      run: dotnet publish
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag ${BlackBox-Auth}:$(date +%s)
+      
