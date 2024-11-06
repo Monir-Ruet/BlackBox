@@ -1,6 +1,7 @@
 name: Blackbox-Auth CI
 
 on:
+  
   push:
     branches: [ "main" ]
     paths:
@@ -9,6 +10,7 @@ on:
     branches: [ "main" ]
     paths:
       - /src/BlackBox.Auth
+  workflow_dispatch:
 env:
   IMAGE_NAME: "BlackBox-Auth"
   
