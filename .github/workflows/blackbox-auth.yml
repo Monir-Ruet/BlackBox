@@ -46,6 +46,6 @@ jobs:
       run: |
         # build and push
         docker buildx build \
-        -f ./src/BlackBox.Auth/Dockerfile . \
+        -f src/BlackBox.Auth/Dockerfile . \
         --push \
         -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_NAME }}:${{ github.sha }}
