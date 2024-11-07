@@ -44,8 +44,6 @@ jobs:
         
     - name: Build and push container image to ACR
       run: |
-        # azure acr login
-        az acr login --name ${{ secrets.AZURE_CONTAINER_REGISTRY }}
         # build and push
         docker buildx build \
         -f ./src/BlackBox.Auth/Dockerfile . \
