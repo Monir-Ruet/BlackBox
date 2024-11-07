@@ -5,9 +5,8 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 env:
-  AZURE_CONTAINER_REGISTRY: blackboxhub
   CONTAINER_APP_NAME: blackbox.auth
-  RESOURCE_GROUP: "Container"
+  RESOURCE_GROUP: Container
   
 jobs:
   Build:
@@ -38,16 +37,13 @@ jobs:
         username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
         password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
     
-    - name: Docker Image Build And Push
+    - name: Build and push container image to ACR
       uses: docker/build-push-action@v6
       with:
         push: true
-        tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_NAME }}
+        tags: ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_NAME }}:${{ github.sha }}
         file: ./src/BlackBox.Auth/Dockerfile
-        context: .
-      # run: |
-      #   docker buildx build \
-      #   -f ./src/BlackBox.Auth/Dockerfile . \
-      #   --push \
-      #   --tag ${{secrets.DOCKER_USERNAME}}/$IMAGE_NAME:latest
-  
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIAL }}
