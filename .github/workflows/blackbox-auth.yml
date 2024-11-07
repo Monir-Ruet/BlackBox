@@ -40,11 +40,19 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
         
+    # - name: Build and push container image to ACR
+    #   run: |
+    #     ls -la
+    #     # build and push
+    #     docker buildx build \
+    #     -f src/BlackBox.Auth/Dockerfile . \
+    #     --push \
+    #     -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_NAME }}:${{ github.sha }}
     - name: Build and push container image to ACR
-      run: |
-        ls -la
-        # build and push
-        docker buildx build \
-        -f src/BlackBox.Auth/Dockerfile . \
-        --push \
-        -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_NAME }}:${{ github.sha }}
+      uses: docker/build-push-action@v6
+      with:
+        push: true
+        tags: ${{ vars.DOCKERHUB_USERNAME }}/clockbox:latest
+        file: src/BlackBox.Auth/Dockerfile
+        context: .
+
