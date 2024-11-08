@@ -78,11 +78,11 @@ jobs:
         echo "TF_VAR_container_app_external_enabled=false" >> $GITHUB_ENV
     - name: Terraform fetch state
       run: |
-        terraform import azurerm_container_app.example "/subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.App/containerApps/blackbox-auth"
-        terraform import azurerm_resource_group.example /subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox"
-        terraform import azurerm_log_analytics_workspace.example /subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.OperationalInsights/workspaces/blackboxlgaw"
-        terraform import azurerm_container_registry.example /subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.ContainerRegistry/registries/blackboxcr"
-        terraform import azurerm_container_app_environment.example "/subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.App/managedEnvironments/blackboxenv"
+        terraform import azurerm_container_app.example /subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.App/containerApps/blackbox-auth
+        terraform import azurerm_resource_group.example /subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox
+        terraform import azurerm_log_analytics_workspace.example /subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.OperationalInsights/workspaces/blackboxlgaw
+        terraform import azurerm_container_registry.example /subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.ContainerRegistry/registries/blackboxcr
+        terraform import azurerm_container_app_environment.example /subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.App/managedEnvironments/blackboxenv
       env:
         subscription_id: f0c6d911-101d-4654-a2ec-492160af09aa
         location: "Southeast Asia"
