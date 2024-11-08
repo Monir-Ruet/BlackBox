@@ -5,13 +5,14 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 env:
-  CONTAINER_APP_NAME: blackbox.auth
-  RESOURCE_GROUP: Container
+  LOCATION: "Southeast Asia"
+  ENABLE_EXTERNAL: true
+  AZURE_CONTAINER_APP_NAME: blackbox-auth
+  AZURE_CONTAINER_IMAGE: blackbox.auth
   
 jobs:
-  Build-Source:
+  Local-Build:
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET
@@ -24,22 +25,22 @@ jobs:
       run: dotnet build src/BlackBox.Auth/BlackBox.Auth.csproj -c Release
     - name: Publish
       run: dotnet publish src/BlackBox.Auth/BlackBox.Auth.csproj
-  Build_Image_And_Push_To_Registry: 
+
+  Build-Image-And-Push-Registry:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
-      
     - name: Azure Login
       uses: azure/login@v2
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-        
+    
     - name: Log in to Azure Container Registry
       uses: azure/docker-login@v2
       with:
-        login-server: ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io
+        login-server: ${{ secrets.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io
         username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
         password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
@@ -47,36 +48,52 @@ jobs:
       uses: docker/build-push-action@v6
       with:
         push: true
-        tags: ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_NAME }}:latest
+        tags: ${{ secrets.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io/${{ env.AZURE_CONTAINER_IMAGE }}:latest
         file: src/BlackBox.Auth/Dockerfile
         context: .
+  
+  Deploy-Container-Apps:
+    needs : 
+      - Build-Image-And-Push-Registry
+      - Local-Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "infastructure/terraform"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.9.8
+          
+      - name: Terraform init
+        run: terraform init
+  
+      - name: Setup Env Variables For Terraform
+        run: |
+          echo "TF_VAR_subscription_id=${{secrets.AZURE_SUBSCRIPTION_ID}}" >> $GITHUB_ENV
+          echo "TF_VAR_location=${{env.LOCATION}}" >> $GITHUB_ENV
+          echo "TF_VAR_resource_group_name=${{secrets.AZURE_RESOURCE_GROUP_NAME}}" >> $GITHUB_ENV
+          echo "TF_VAR_acr_name=${{secrets.AZURE_CONTAINER_REGISTRY_NAME}}" >> $GITHUB_ENV
+          echo "TF_VAR_container_app_env_name=${{secrets.AZURE_CONTAINER_APP_ENV_NAME}}" >> $GITHUB_ENV
+          echo "TF_VAR_container_app_name=${{env.AZURE_CONTAINER_APP_NAME}}" >> $GITHUB_ENV
+          echo "TF_VAR_container_image=${{env.AZURE_CONTAINER_IMAGE}}" >> $GITHUB_ENV
+          echo "TF_VAR_dapr_app_id=${{env.DAPR_APP_ID}}" >> $GITHUB_ENV
+          echo "TF_VAR_container_log_analytics_workspace=${{secrets.AZURE_LOG_ANALYTICS_WORKSPACE}}" >> $GITHUB_ENV
+          echo "TF_VAR_container_app_external_enabled=${{env.ENABLE_EXTERNAL}}" >> $GITHUB_ENV
       
-    - name: Navigate to Terraform
-      run: cd infastructure/terraform
-    - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_version: 1.9.8
-    - name: Terraform init
-      run: terraform init
-    - name: Terraform fetch state
-      run: |
-        terraform import azurerm_container_app.example "/subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.App/containerApps/blackbox-auth
-        terraform import azurerm_resource_group.example /subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox
-        terraform import azurerm_log_analytics_workspace.example /subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.OperationalInsights/workspaces/blackboxlgaw
-        terraform import azurerm_container_registry.example /subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.ContainerRegistry/registries/blackboxcr
-        terraform import azurerm_container_app_environment.example "/subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.App/managedEnvironments/blackboxenv
-
-    - name: Terraform apply
-      run: terraform apply -auto-approve
-      env:
-        TF_VAR_subscription_id: f0c6d911-101d-4654-a2ec-492160af09aa
-        TF_VAR_location: "Southeast Asia"
-        TF_VAR_resource_group_name: blackbox
-        TF_VAR_acr_name: blackboxcr
-        TF_VAR_container_app_env_name: blackboxenv
-        TF_VAR_container_app_name: blackbox-auth
-        TF_VAR_container_image: blackbox.auth
-        TF_VAR_dapr_app_id: "blackbox-dapr"
-        TF_VAR_container_log_analytics_workspace: "blackboxlgaw"
-        TF_VAR_container_app_external_enabled: false
+      - name: Terraform Fetch state
+        run: |
+          terraform import azurerm_container_app.example /subscriptions/${{secrets.AZURE_SUBSCRIPTION_ID}}/resourceGroups/${{secrets.AZURE_RESOURCE_GROUP_NAME}}/providers/Microsoft.App/containerApps/${{env.AZURE_CONTAINER_APP_NAME}}
+          terraform import azurerm_resource_group.example /subscriptions/${{secrets.AZURE_SUBSCRIPTION_ID}}/resourceGroups/${{secrets.AZURE_RESOURCE_GROUP_NAME}}
+          terraform import azurerm_log_analytics_workspace.example /subscriptions/${{secrets.AZURE_SUBSCRIPTION_ID}}/resourceGroups/${{secrets.AZURE_RESOURCE_GROUP_NAME}}/providers/Microsoft.OperationalInsights/workspaces/${{secrets.AZURE_LOG_ANALYTICS_WORKSPACE}}
+          terraform import azurerm_container_registry.example /subscriptions/${{secrets.AZURE_SUBSCRIPTION_ID}}/resourceGroups/${{secrets.AZURE_RESOURCE_GROUP_NAME}}/providers/Microsoft.ContainerRegistry/registries/${{secrets.AZURE_CONTAINER_REGISTRY_NAME}}
+          terraform import azurerm_container_app_environment.example /subscriptions/${{secrets.AZURE_SUBSCRIPTION_ID}}/resourceGroups/${{secrets.AZURE_RESOURCE_GROUP_NAME}}/providers/Microsoft.App/managedEnvironments/${{secrets.AZURE_CONTAINER_APP_ENV_NAME}}
+        
+      - name: Terraform apply deploy
+        run: terraform apply -auto-approve
