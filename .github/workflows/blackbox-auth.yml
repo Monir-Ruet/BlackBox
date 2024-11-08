@@ -52,7 +52,7 @@ jobs:
         context: .
       
     - name: Navigate to Terraform
-      run: cd infastructure/teraform
+      run: cd infastructure/terraform
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v2
       with:
