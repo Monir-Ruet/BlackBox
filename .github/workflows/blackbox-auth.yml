@@ -49,9 +49,9 @@ jobs:
   Deploy:
     # needs : Build_And_Push_Image
     runs-on: unbuntu-latest
-    defaults:
-      run:
-        working-directory: "infastructure/terraform"
+    # defaults:
+    #   run:
+    #     working-directory: "infastructure/terraform"
     steps:
       - uses: actions/checkout@v4
       - name: Set up Terraform
