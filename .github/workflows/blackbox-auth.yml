@@ -60,6 +60,7 @@ jobs:
         terraform_version: 1.9.8
     - name: Terraform init
       run: terraform init
+      working-directory: "infastructure/terraform/"
     - name: Terraform fetch state
       run: |
         terraform import azurerm_container_app.example "/subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.App/containerApps/blackbox-auth
@@ -67,7 +68,8 @@ jobs:
         terraform import azurerm_log_analytics_workspace.example /subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.OperationalInsights/workspaces/blackboxlgaw
         terraform import azurerm_container_registry.example /subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.ContainerRegistry/registries/blackboxcr
         terraform import azurerm_container_app_environment.example "/subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.App/managedEnvironments/blackboxenv
-
+      working-directory: "infastructure/terraform/"
+      
     - name: Terraform apply
       run: terraform apply -auto-approve
       env:
@@ -81,3 +83,4 @@ jobs:
         TF_VAR_dapr_app_id: "blackbox-dapr"
         TF_VAR_container_log_analytics_workspace: "blackboxlgaw"
         TF_VAR_container_app_external_enabled: false
+      working-directory: "infastructure/terraform/"
