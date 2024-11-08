@@ -61,13 +61,28 @@ jobs:
     - name: Terraform init
       run: terraform init
       working-directory: "infastructure/terraform/"
+    - name: Terraform variable file
+      run: |
+        cat > variables.json
+        {
+        	subscription_id:"f0c6d911-101d-4654-a2ec-492160af09aa"
+        	location: "Southeast Asia"
+        	resource_group_name:"blackbox"
+        	acr_name:"blackboxcr"
+        	container_app_env_name:"blackboxenv"
+        	container_app_name:"blackbox-auth"
+        	container_image:"blackbox.auth"
+        	dapr_app_id:"blackbox-dapr"
+        	container_log_analytics_workspace:"blackboxlgaw"
+          container_app_external_enabled: false
+        }
     - name: Terraform fetch state
       run: |
-        terraform import azurerm_container_app.example "/subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.App/containerApps/blackbox-auth
-        terraform import azurerm_resource_group.example /subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox
-        terraform import azurerm_log_analytics_workspace.example /subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.OperationalInsights/workspaces/blackboxlgaw
-        terraform import azurerm_container_registry.example /subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.ContainerRegistry/registries/blackboxcr
-        terraform import azurerm_container_app_environment.example "/subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.App/managedEnvironments/blackboxenv
+        terraform import azurerm_container_app.example "/subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.App/containerApps/blackbox-auth -var-file="variables.json"
+        terraform import azurerm_resource_group.example /subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox -var-file="variables.json"
+        terraform import azurerm_log_analytics_workspace.example /subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.OperationalInsights/workspaces/blackboxlgaw -var-file="variables.json"
+        terraform import azurerm_container_registry.example /subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.ContainerRegistry/registries/blackboxcr -var-file="variables.json"
+        terraform import azurerm_container_app_environment.example "/subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.App/managedEnvironments/blackboxenv -var-file="variables.json"
       working-directory: "infastructure/terraform/"
       
     - name: Terraform apply
