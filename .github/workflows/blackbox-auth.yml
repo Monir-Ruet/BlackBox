@@ -63,7 +63,7 @@ jobs:
       working-directory: "infastructure/terraform/"
     - name: Terraform variable file
       run: |
-        cat > variables.json
+        echo"
         {
         	subscription_id:"f0c6d911-101d-4654-a2ec-492160af09aa"
         	location: "Southeast Asia"
@@ -75,7 +75,8 @@ jobs:
         	dapr_app_id:"blackbox-dapr"
         	container_log_analytics_workspace:"blackboxlgaw"
           container_app_external_enabled: false
-        }
+        }" > variables.json
+        cat variables.json
     - name: Terraform fetch state
       run: |
         terraform import azurerm_container_app.example "/subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.App/containerApps/blackbox-auth -var-file="variables.json"
