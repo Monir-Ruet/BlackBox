@@ -54,8 +54,8 @@ jobs:
     needs : Build_Image_And_Push_To_Registry
     runs-on: unbuntu-latest
     defaults:
-      runs:
-        working-directory: "/infastructure/terraform"
+      run:
+        working-directory: "infastructure/terraform"
     steps:
       - uses: actions/checkout@v4
       - name: Set up Terraform
