@@ -58,10 +58,24 @@ jobs:
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: 1.9.8
+        
     - name: Terraform init
       run: terraform init
       working-directory: "infastructure/terraform/"
 
+    - name: Setup Env Variables
+      run: |
+        echo "TF_VAR_api_key=${{ secrets.API_KEY }}" >> $GITHUB_ENV
+        echo "TF_VAR_subscription_id=f0c6d911-101d-4654-a2ec-492160af09aa" >> $GITHUB_ENV
+        echo "TF_VAR_location=Southeast Asia" >> $GITHUB_ENV
+        echo "TF_VAR_resource_group_name=blackbox" >> $GITHUB_ENV
+        echo "TF_VAR_acr_name=blackboxcr" >> $GITHUB_ENV
+        echo "TF_VAR_container_app_env_name=blackboxenv" >> $GITHUB_ENV
+        echo "TF_VAR_container_app_name=blackbox-auth" >> $GITHUB_ENV
+        echo "TF_VAR_container_image=blackbox.auth" >> $GITHUB_ENV
+        echo "TF_VAR_dapr_app_id=blackbox-dapr" >> $GITHUB_ENV
+        echo "TF_VAR_container_log_analytics_workspace=blackboxlgaw" >> $GITHUB_ENV
+        echo "TF_VAR_container_app_external_enabled=false" >> $GITHUB_ENV
     - name: Terraform fetch state
       run: |
         terraform import azurerm_container_app.example "/subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.App/containerApps/blackbox-auth -var-file="variables.json"
