@@ -70,29 +70,29 @@ jobs:
         terraform import azurerm_container_registry.example /subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.ContainerRegistry/registries/blackboxcr -var-file="variables.json"
         terraform import azurerm_container_app_environment.example "/subscriptions/f0c6d911-101d-4654-a2ec-492160af09aa/resourceGroups/blackbox/providers/Microsoft.App/managedEnvironments/blackboxenv -var-file="variables.json"
       env:
-        TF_VAR_subscription_id: f0c6d911-101d-4654-a2ec-492160af09aa
-        TF_VAR_location: "Southeast Asia"
-        TF_VAR_resource_group_name: blackbox
-        TF_VAR_acr_name: blackboxcr
-        TF_VAR_container_app_env_name: blackboxenv
-        TF_VAR_container_app_name: blackbox-auth
-        TF_VAR_container_image: blackbox.auth
-        TF_VAR_dapr_app_id: "blackbox-dapr"
-        TF_VAR_container_log_analytics_workspace: "blackboxlgaw"
-        TF_VAR_container_app_external_enabled: false
+        subscription_id: f0c6d911-101d-4654-a2ec-492160af09aa
+        location: "Southeast Asia"
+        resource_group_name: blackbox
+        acr_name: blackboxcr
+        container_app_env_name: blackboxenv
+        container_app_name: blackbox-auth
+        container_image: blackbox.auth
+        dapr_app_id: "blackbox-dapr"
+        container_log_analytics_workspace: "blackboxlgaw"
+        container_app_external_enabled: false
       working-directory: "infastructure/terraform/"
       
     - name: Terraform apply
       run: terraform apply -auto-approve
       env:
-        TF_VAR_subscription_id: f0c6d911-101d-4654-a2ec-492160af09aa
-        TF_VAR_location: "Southeast Asia"
-        TF_VAR_resource_group_name: blackbox
-        TF_VAR_acr_name: blackboxcr
-        TF_VAR_container_app_env_name: blackboxenv
-        TF_VAR_container_app_name: blackbox-auth
-        TF_VAR_container_image: blackbox.auth
-        TF_VAR_dapr_app_id: "blackbox-dapr"
-        TF_VAR_container_log_analytics_workspace: "blackboxlgaw"
-        TF_VAR_container_app_external_enabled: false
+        subscription_id: f0c6d911-101d-4654-a2ec-492160af09aa
+        location: "Southeast Asia"
+        resource_group_name: blackbox
+        acr_name: blackboxcr
+        container_app_env_name: blackboxenv
+        container_app_name: blackbox-auth
+        container_image: blackbox.auth
+        dapr_app_id: "blackbox-dapr"
+        container_log_analytics_workspace: "blackboxlgaw"
+        container_app_external_enabled: false
       working-directory: "infastructure/terraform/"
