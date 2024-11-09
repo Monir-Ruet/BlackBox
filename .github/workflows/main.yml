@@ -1,0 +1,67 @@
+name: Dynamic Microservices Pipeline
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'  # Trigger on changes under the 'src' directory
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/**'  # Trigger on PRs with changes under 'src'
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      changed_services: ${{ steps.get_changed_services.outputs.changed_services }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Detect changed microservices
+        id: get_changed_services
+        run: |
+          # Detect changed directories (microservices)
+          changed_dirs=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^src/' | cut -d'/' -f2 | sort | uniq)
+          echo "Changed microservices: $changed_dirs"
+          
+          # Create the output list of changed services
+          if [ -z "$changed_dirs" ]; then
+            echo "No services changed."
+            echo "changed_services=[]" >> $GITHUB_ENV
+            echo "::set-output name=changed_services::[]"
+          else
+            echo "changed_services=$changed_dirs" >> $GITHUB_ENV
+            echo "::set-output name=changed_services::[$changed_dirs]"
+          fi
+
+  build-and-deploy:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.detect-changes.outputs.changed_services) }}
+        # Dynamically use the list of changed services
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Build and deploy ${{ matrix.service }} (if changed)
+        run: |
+          echo "Building and deploying ${matrix.service}"
+          dotnet restore src/${matrix.service}/${matrix.service}.csproj
+          dotnet build src/${matrix.service}/${matrix.service}.csproj -c Release
+          dotnet publish src/${matrix.service}/${matrix.service}.csproj
+          docker build -t your-acr-registry/${matrix.service}:latest src/${matrix.service}
+          docker push your-acr-registry/${matrix.service}:latest
+          terraform apply -auto-approve
