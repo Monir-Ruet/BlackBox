@@ -23,6 +23,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    - name: Echo GitHub Event Payload
+      run: |
+        echo "GitHub Event Data:"
+        echo "${{ toJson(github.event) }}"  # Print the full event payload
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
