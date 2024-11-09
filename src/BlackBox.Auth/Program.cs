@@ -60,7 +60,7 @@ app.MapPost("/orders", (Order order) =>
 }).WithTopic("pubsub", "orders");
 
 app.MapGet("/", () => "Hello from Auth.");
-app.MapGet("/monir", () => "Hello from Monir. Love u all.More");
+app.MapGet("/monir", () => "Hello from Monir. Love u all.Mor");
 app.Run();
 
 public record Order([property: JsonPropertyName("orderId")] int OrderId);
