@@ -21,10 +21,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # This ensures we fetch the full commit history
 
       - name: Detect changed microservices
         id: get_changed_services
         run: |
+          # Fetch full history to make sure we have previous commit data
+          git fetch --prune --unshallow
+
           # Detect changed directories (microservices)
           changed_dirs=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^src/' | cut -d'/' -f2 | sort | uniq)
           echo "Changed microservices: $changed_dirs"
