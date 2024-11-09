@@ -52,7 +52,7 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapSubscribeHandler();
 app.UseCloudEvents();
-d
+dd
 app.MapPost("/orders", (Order order) =>
 {
     Console.WriteLine("Subscriber received : " + order);
