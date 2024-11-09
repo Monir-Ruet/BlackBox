@@ -5,6 +5,7 @@ on:
     branches: [ "main" ]
     paths:
       - src/BlackBox.Auth/*
+  
   pull_request:
     branches: [ "main" ]
     paths:
@@ -54,7 +55,7 @@ jobs:
     - name: Build and push container image to ACR
       uses: docker/build-push-action@v6
       with:
-        push: true
+        push: github.event.pull_request.merged == true
         tags: ${{ secrets.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io/${{ env.AZURE_CONTAINER_IMAGE }}:latest
         file: src/BlackBox.Auth/Dockerfile
         context: .
@@ -67,6 +68,9 @@ jobs:
     defaults:
       run:
         working-directory: "infastructure/terraform"
+        
+    if: github.event.pull_request.merged == true
+    
     steps:
       - uses: actions/checkout@v4
       - name: Azure Login
