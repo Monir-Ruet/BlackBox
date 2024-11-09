@@ -45,4 +45,8 @@ app.MapGet("/order", async () =>
     Console.WriteLine("Published data " + randomNumber);
 });
 
+app.MapGet("/hello", ()=>{
+    return "Hello";
+})
+
 app.Run();
