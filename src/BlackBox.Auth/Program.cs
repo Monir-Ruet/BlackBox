@@ -52,7 +52,7 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapSubscribeHandler();
 app.UseCloudEvents();
-
+d
 app.MapPost("/orders", (Order order) =>
 {
     Console.WriteLine("Subscriber received : " + order);
@@ -60,7 +60,7 @@ app.MapPost("/orders", (Order order) =>
 }).WithTopic("pubsub", "orders");
 
 app.MapGet("/", () => "Hello from Auth.");
-app.MapGet("/monir", () => "Hello from Monir. Love u all.");
+app.MapGet("/monir", () => "Hello from Monir. Love u all.Mor");
 app.Run();
 
 public record Order([property: JsonPropertyName("orderId")] int OrderId);
