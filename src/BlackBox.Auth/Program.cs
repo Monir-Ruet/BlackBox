@@ -59,7 +59,7 @@ app.MapPost("/orders", (Order order) =>
     return Results.Ok(order);
 }).WithTopic("pubsub", "orders");
 
-app.MapGet("/", () => "Hello from Auth.");
+app.MapGet("/", () => "Hello from Auth");
 app.MapGet("/monir", () => "Hello from Monir. Love u all.Moree");
 app.Run();
 
