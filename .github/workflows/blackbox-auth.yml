@@ -4,12 +4,12 @@ on:
   push:
     branches: ["main"]
     paths:
-      - src/**
+      - src/BlackBox.Auth/*
 
   pull_request:
     branches: ["main"]
     paths:
-      - src/**
+      - src/BlackBox.Auth/*
 
   workflow_dispatch:
 env:
@@ -29,8 +29,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
-      - name: L
-        run: echo ${{ fromJson(steps.set_changed_services.outputs.changed_services) }}
       - name: Restore .NET Dependencies
         run: dotnet restore src/BlackBox.Auth/BlackBox.Auth.csproj
       - name: Build .NET Application
