@@ -3,6 +3,13 @@ name: Blackbox-Auth
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - src/BlackBox.Auth/*
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - src/BlackBox.Auth/*
+      
   workflow_dispatch:
 env:
   LOCATION: "Southeast Asia"
