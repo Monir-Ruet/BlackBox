@@ -12,7 +12,7 @@ on:
       - main
     paths:
       - 'src/**'  # Trigger on PRs with changes under 'src'
-
+  workflow_dispatch:
 jobs:
   detect-changes:
     runs-on: ubuntu-latest
