@@ -4,14 +4,10 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'src/**'  # Trigger on changes under the 'src' directory
 
   pull_request:
     branches:
       - main
-    paths:
-      - 'src/**'  # Trigger on PRs with changes under 'src'
   workflow_dispatch:
 jobs:
   deploy:
