@@ -2,78 +2,78 @@ name: Blackbox-Auth
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
     paths:
       - src/BlackBox.Auth/*
-  
+
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
     paths:
       - src/BlackBox.Auth/*
-      
+
   workflow_dispatch:
 env:
   LOCATION: "Southeast Asia"
   ENABLE_EXTERNAL: true
   AZURE_CONTAINER_APP_NAME: blackbox-auth
   AZURE_CONTAINER_IMAGE: blackbox.auth
-  
+
 jobs:
   # Job to build and test the application locally
-  
+
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
-    - name: Restore .NET Dependencies
-      run: dotnet restore src/BlackBox.Auth/BlackBox.Auth.csproj
-    - name: Build .NET Application
-      run: dotnet build src/BlackBox.Auth/BlackBox.Auth.csproj -c Release
-    - name: Publish .NET Application
-      run: dotnet publish src/BlackBox.Auth/BlackBox.Auth.csproj
+      - uses: actions/checkout@v4
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Restore .NET Dependencies
+        run: dotnet restore src/BlackBox.Auth/BlackBox.Auth.csproj
+      - name: Build .NET Application
+        run: dotnet build src/BlackBox.Auth/BlackBox.Auth.csproj -c Release
+      - name: Publish .NET Application
+        run: dotnet publish src/BlackBox.Auth/BlackBox.Auth.csproj
 
   # Job to build Docker image and push it to Azure Container Registry
   build-and-push-image:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-    - name: Log in to Azure
-      uses: azure/login@v2
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-    
-    - name: Log in to Azure Container Registry (ACR)
-      uses: azure/docker-login@v2
-      with:
-        login-server: ${{ secrets.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io
-        username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
-        password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Log in to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Build and Push Docker Image to ACR
-      uses: docker/build-push-action@v6
-      with:
-        push: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true }}
-        tags: ${{ secrets.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io/${{ env.AZURE_CONTAINER_IMAGE }}:latest
-        file: src/BlackBox.Auth/Dockerfile
-        context: .
-  
-  Deploy-Container-Apps:
-    needs : 
+      - name: Log in to Azure Container Registry (ACR)
+        uses: azure/docker-login@v2
+        with:
+          login-server: ${{ secrets.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io
+          username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
+          password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+
+      - name: Build and Push Docker Image to ACR
+        uses: docker/build-push-action@v6
+        with:
+          push: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true }}
+          tags: ${{ secrets.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io/${{ env.AZURE_CONTAINER_IMAGE }}:latest
+          file: src/BlackBox.Auth/Dockerfile
+          context: .
+
+  deploy-container-app:
+    needs:
       - build-and-push-image
       - build-and-test
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: "infastructure/terraform"
-        
+
     if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
-    
+
     steps:
       - uses: actions/checkout@v4
       - name: Log in to Azure
@@ -84,10 +84,10 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.9.8
-          
+
       - name: Initialize Terraform
         run: terraform init
-  
+
       - name: Set Terraform Environment Variables
         run: |
           echo "TF_VAR_subscription_id=${{secrets.AZURE_SUBSCRIPTION_ID}}" >> $GITHUB_ENV
@@ -100,7 +100,7 @@ jobs:
           echo "TF_VAR_dapr_app_id=${{env.DAPR_APP_ID}}" >> $GITHUB_ENV
           echo "TF_VAR_container_log_analytics_workspace=${{secrets.AZURE_LOG_ANALYTICS_WORKSPACE}}" >> $GITHUB_ENV
           echo "TF_VAR_container_app_external_enabled=${{env.ENABLE_EXTERNAL}}" >> $GITHUB_ENV
-      
+
       - name: Import Terraform State
         run: |
           terraform import azurerm_container_app.example /subscriptions/${{secrets.AZURE_SUBSCRIPTION_ID}}/resourceGroups/${{secrets.AZURE_RESOURCE_GROUP_NAME}}/providers/Microsoft.App/containerApps/${{env.AZURE_CONTAINER_APP_NAME}}
@@ -108,6 +108,6 @@ jobs:
           terraform import azurerm_log_analytics_workspace.example /subscriptions/${{secrets.AZURE_SUBSCRIPTION_ID}}/resourceGroups/${{secrets.AZURE_RESOURCE_GROUP_NAME}}/providers/Microsoft.OperationalInsights/workspaces/${{secrets.AZURE_LOG_ANALYTICS_WORKSPACE}}
           terraform import azurerm_container_registry.example /subscriptions/${{secrets.AZURE_SUBSCRIPTION_ID}}/resourceGroups/${{secrets.AZURE_RESOURCE_GROUP_NAME}}/providers/Microsoft.ContainerRegistry/registries/${{secrets.AZURE_CONTAINER_REGISTRY_NAME}}
           terraform import azurerm_container_app_environment.example /subscriptions/${{secrets.AZURE_SUBSCRIPTION_ID}}/resourceGroups/${{secrets.AZURE_RESOURCE_GROUP_NAME}}/providers/Microsoft.App/managedEnvironments/${{secrets.AZURE_CONTAINER_APP_ENV_NAME}}
-        
+
       - name: Apply Terraform Configuration and Deploy
         run: terraform apply -auto-approve
