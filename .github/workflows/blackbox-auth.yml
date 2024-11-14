@@ -59,7 +59,8 @@ jobs:
       - name: Build and Push Docker Image to ACR
         uses: docker/build-push-action@v6
         with:
-          push: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true }}
+          # push: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true }}
+          push: true
           tags: ${{ secrets.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io/${{ env.AZURE_CONTAINER_IMAGE }}:latest
           file: src/BlackBox.Auth/Dockerfile
           context: .
