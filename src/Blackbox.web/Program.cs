@@ -47,6 +47,6 @@ app.MapGet("/order", async () =>
 
 app.MapGet("/hello", ()=>{
     return "Hello";
-})
+});
 
 app.Run();
