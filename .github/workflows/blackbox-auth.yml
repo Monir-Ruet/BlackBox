@@ -105,11 +105,11 @@ jobs:
 
       - name: Import Terraform State
         run: |
-          terraform import azurerm_container_app.example /subscriptions/${{secrets.AZURE_SUBSCRIPTION_ID}}/resourceGroups/${{secrets.AZURE_RESOURCE_GROUP_NAME}}/providers/Microsoft.App/containerApps/${{env.AZURE_CONTAINER_APP_NAME}}
-          terraform import azurerm_resource_group.example /subscriptions/${{secrets.AZURE_SUBSCRIPTION_ID}}/resourceGroups/${{secrets.AZURE_RESOURCE_GROUP_NAME}}
-          terraform import azurerm_log_analytics_workspace.example /subscriptions/${{secrets.AZURE_SUBSCRIPTION_ID}}/resourceGroups/${{secrets.AZURE_RESOURCE_GROUP_NAME}}/providers/Microsoft.OperationalInsights/workspaces/${{secrets.AZURE_LOG_ANALYTICS_WORKSPACE}}
-          terraform import azurerm_container_registry.example /subscriptions/${{secrets.AZURE_SUBSCRIPTION_ID}}/resourceGroups/${{secrets.AZURE_RESOURCE_GROUP_NAME}}/providers/Microsoft.ContainerRegistry/registries/${{secrets.AZURE_CONTAINER_REGISTRY_NAME}}
-          terraform import azurerm_container_app_environment.example /subscriptions/${{secrets.AZURE_SUBSCRIPTION_ID}}/resourceGroups/${{secrets.AZURE_RESOURCE_GROUP_NAME}}/providers/Microsoft.App/managedEnvironments/${{secrets.AZURE_CONTAINER_APP_ENV_NAME}}
+          terraform import azurerm_container_app.example /subscriptions/${{secrets.AZURE_SUBSCRIPTION_ID}}/resourceGroups/${{secrets.AZURE_RESOURCE_GROUP_NAME}}/providers/Microsoft.App/containerApps/${{env.AZURE_CONTAINER_APP_NAME}} || true
+          terraform import azurerm_resource_group.example /subscriptions/${{secrets.AZURE_SUBSCRIPTION_ID}}/resourceGroups/${{secrets.AZURE_RESOURCE_GROUP_NAME}} || true
+          terraform import azurerm_log_analytics_workspace.example /subscriptions/${{secrets.AZURE_SUBSCRIPTION_ID}}/resourceGroups/${{secrets.AZURE_RESOURCE_GROUP_NAME}}/providers/Microsoft.OperationalInsights/workspaces/${{secrets.AZURE_LOG_ANALYTICS_WORKSPACE}} || true
+          terraform import azurerm_container_registry.example /subscriptions/${{secrets.AZURE_SUBSCRIPTION_ID}}/resourceGroups/${{secrets.AZURE_RESOURCE_GROUP_NAME}}/providers/Microsoft.ContainerRegistry/registries/${{secrets.AZURE_CONTAINER_REGISTRY_NAME}} || true
+          terraform import azurerm_container_app_environment.example /subscriptions/${{secrets.AZURE_SUBSCRIPTION_ID}}/resourceGroups/${{secrets.AZURE_RESOURCE_GROUP_NAME}}/providers/Microsoft.App/managedEnvironments/${{secrets.AZURE_CONTAINER_APP_ENV_NAME}} || true
 
       - name: Apply Terraform Configuration and Deploy
         run: terraform apply -auto-approve
