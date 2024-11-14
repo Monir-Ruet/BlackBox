@@ -4,7 +4,7 @@ on:
   push:
     branches: ["main"]
     paths:
-      - src/BlackBox.web/*
+      - src/Blackbox.web/*
 
   pull_request:
     branches: ["main"]
