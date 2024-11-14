@@ -61,7 +61,7 @@ jobs:
         with:
           push: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true }}
           tags: ${{ secrets.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io/${{ env.AZURE_CONTAINER_IMAGE }}:latest
-          file: src/BlackBox.web/Dockerfile
+          file: src/Blackbox.web/Dockerfile
           context: .
 
   deploy-container-app:
