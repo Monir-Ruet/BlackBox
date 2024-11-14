@@ -31,11 +31,11 @@ jobs:
         with:
           dotnet-version: 8.0.x
       - name: Restore .NET Dependencies
-        run: dotnet restore src/BlackBox.web/BlackBox.web.csproj
+        run: dotnet restore src/Blackbox.web/Blackbox.web.csproj
       - name: Build .NET Application
-        run: dotnet build src/BlackBox.web/BlackBox.web.csproj -c Release
+        run: dotnet build src/Blackbox.web/Blackbox.web.csproj -c Release
       - name: Publish .NET Application
-        run: dotnet publish src/BlackBox.web/BlackBox.web.csproj
+        run: dotnet publish src/Blackbox.web/Blackbox.web.csproj
 
   # Job to build Docker image and push it to Azure Container Registry
   build-and-push-image:
@@ -73,7 +73,7 @@ jobs:
       run:
         working-directory: "infastructure/terraform"
 
-    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
+    # if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
 
     steps:
       - uses: actions/checkout@v4
