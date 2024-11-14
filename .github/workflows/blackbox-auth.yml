@@ -17,7 +17,7 @@ env:
   ENABLE_EXTERNAL: true
   AZURE_CONTAINER_APP_NAME: blackbox-auth
   AZURE_CONTAINER_IMAGE: blackbox.auth
-  DAPR_APP_ID: blackbox-auth-dapr
+  DAPR_APP_ID: blackbox-auth
 
 jobs:
   # Job to build and test the application locally
