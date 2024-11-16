@@ -50,10 +50,7 @@
       context: .
       dockerfile: src/Blackbox.web/Dockerfile
     depends_on:
-      - redis
-      - rabbitmq
-      - placement
-      - zipkin
+      - blackbox-auth
     ports:
       - "50101:50001"
       - "8081:8080"
